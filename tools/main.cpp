@@ -528,7 +528,7 @@ int main(int argc, char **argv)
             std::cout << toolkit.RenderToTimemap();
         }
         else if (!toolkit.RenderToTimemapFile(outfile)) {
-            std::cerr << "Unable to write MIDI to " << outfile << "." << std::endl;
+            std::cerr << "Unable to write timemap to " << outfile << "." << std::endl;
             exit(1);
         }
         else {

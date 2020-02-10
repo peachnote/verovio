@@ -1193,7 +1193,30 @@ int Measure::GenerateTimemap(FunctorParams *functorParams)
     // Deal with repeated music later, for now get the last times.
     params->m_scoreTimeOffset = m_scoreTimeOffset.back();
     params->m_realTimeOffsetMilliseconds = m_realTimeOffsetMilliseconds.back();
-    params->m_currentTempo = m_currentTempo;
+    params->m_currentTempo = m_currentTempo; // this ignores tempo changes within the measure, FIXME
+
+
+    double scoreTimeStart = params->m_scoreTimeOffset;
+    double realTimeStart = params->m_realTimeOffsetMilliseconds;
+
+    double scoreTimeEnd = params->m_scoreTimeOffset +  m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX;
+    double realTimeEnd = params->m_realTimeOffsetMilliseconds + (m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX) * 60.0 / m_currentTempo * 1000;
+
+    // Should check if value for realTimeStart already exists and if so, then
+    // ensure that it is equal to scoreTimeStart:
+    params->realTimeToScoreTime[realTimeStart] = scoreTimeStart;
+
+    // Store the element ID in list to turn on at given time.
+    params->realTimeToOnElements[realTimeStart].push_back(this->GetUuid());
+
+    // Should check if value for realTimeEnd already exists and if so, then
+    // ensure that it is equal to scoreTimeEnd:
+    params->realTimeToScoreTime[realTimeEnd] = scoreTimeEnd;
+
+    // Store the element ID in list to turn off at given time.
+    params->realTimeToOffElements[realTimeEnd].push_back(this->GetUuid());
+
+    params->realTimeToTempo[realTimeStart] = params->m_currentTempo;
 
     return FUNCTOR_CONTINUE;
 }
